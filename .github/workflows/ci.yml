@@ -2,44 +2,104 @@ name: UI Test Automation
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, develop ]
   pull_request:
     branches: [ main ]
 
 permissions:
   contents: read
+  pages: write
+  id-token: write
 
 jobs:
   ui-tests:
     name: Run Selenium Tests
     runs-on: ubuntu-latest
-
+    
     env:
       BASE_URL: https://automationexercise.com
       AE_USERNAME: ${{ secrets.AE_USERNAME }}
       AE_PASSWORD: ${{ secrets.AE_PASSWORD }}
-
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
+      
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-
+      
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+      
       - name: Install dependencies
         run: |
+          sudo apt-get update
+          sudo apt-get install -y wget unzip xvfb
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-
-      - name: Run tests with pytest
+      
+      - name: Install Allure CLI
         run: |
-          pytest --maxfail=1 --disable-warnings -v
-
-      - name: Upload test results (optional)
+          wget -q https://github.com/allure-framework/allure2/releases/download/2.24.1/allure-2.24.1.tgz
+          tar -zxf allure-2.24.1.tgz
+          sudo mv allure-2.24.1 /opt/allure
+          echo "/opt/allure/bin" >> $GITHUB_PATH
+      
+      - name: Create directories
+        run: mkdir -p allure-results screenshots test-reports
+      
+      - name: Run tests
+        run: |
+          xvfb-run -a pytest \
+            --maxfail=1 \
+            --disable-warnings \
+            --verbose \
+            --alluredir=allure-results \
+            --tb=short \
+            --capture=no
+        continue-on-error: true
+      
+      - name: Generate Allure Report
+        if: always()
+        run: allure generate allure-results --clean --output allure-report
+      
+      - name: Upload artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: pytest-results
-          path: ./tests
+          name: test-results
+          path: |
+            allure-results/
+            allure-report/
+            screenshots/
+            test-reports/
+          retention-days: 30
+
+  deploy-report:
+    name: Deploy Report
+    needs: ui-tests
+    runs-on: ubuntu-latest
+    if: always() && github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: test-results
+      
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+      
+      - name: Upload to Pages
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: allure-report
+      
+      - name: Deploy to Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
