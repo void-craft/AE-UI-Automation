@@ -1,19 +1,15 @@
-AutomationExercise Selenium POM UI Test Automation
+# AutomationExercise Selenium POM UI Test Automation
 This project contains automated UI tests for Automation Exercise using Selenium WebDriver with Python and the Page Object Model (POM) design pattern. Tests are implemented with PyTest to ensure maintainability and scalability.
 
-Features
-Clean Page Object Model architecture
+### Features
+- Clean Page Object Model architecture
+- Selenium 4.6+ with automatic WebDriver management (no manual driver setup)
+- PyTest integration with fixtures and markers
+- Secure handling of credentials via environment variables and GitHub Secrets
+- Continuous Integration configured with GitHub Actions
 
-Selenium 4.6+ with automatic WebDriver management (no manual driver setup)
-
-PyTest integration with fixtures and markers
-
-Secure handling of credentials via environment variables and GitHub Secrets
-
-Continuous Integration configured with GitHub Actions
-
-Project Structure
-bash
+### Project Structure
+```bash
 Copy code
 automationexercise-selenium-pom/
 ├── .github/
@@ -35,51 +31,66 @@ automationexercise-selenium-pom/
 ├── pytest.ini                # PyTest configuration
 ├── .env                      # Local environment variables (ignored in git)
 └── README.md                 # Project documentation
-Getting Started
+```
+
+### Getting Started
 Prerequisites
 Python 3.11 or higher
-
 pip package manager
 
-Installation
+### Installation
 Clone the repository:
 
-bash
+```bash
 Copy code
 git clone <repo-url>
 cd automationexercise-selenium-pom
-Create and activate a virtual environment:
+```
 
-bash
+### Create and activate a virtual environment:
+
+```bash
 Copy code
 python -m venv venv
 source venv/bin/activate     # Linux/Mac
 .\venv\Scripts\activate      # Windows
-Install dependencies:
+```
 
-bash
+### Install dependencies:
+
+```bash
 Copy code
 pip install -r requirements.txt
-Create a .env file in the project root with your credentials:
+```
 
-ini
+### Create a .env file in the project root with your credentials:
+
+```ini
 Copy code
 AE_USERNAME=your_email@example.com
 AE_PASSWORD=your_password
 BASE_URL=https://automationexercise.com
+```
+
 Note: Since this project uses Selenium 4.6 or later, the WebDriver binaries (e.g., ChromeDriver) are managed automatically by Selenium — no manual driver downloads or PATH setup needed.
 
-Running Tests
+### Running Tests
 Run all tests with:
 
-bash
+```bash
 Copy code
 pytest -v
-CI/CD Integration
+```
+
+### CI/CD Integration
 The project is configured to run tests automatically on push and pull requests via GitHub Actions. Credentials are securely injected using GitHub Secrets.
 
-Contributing
+### Contributing
 Feel free to open issues or submit pull requests to improve test coverage or add features.
 
-License
+### License
 MIT License
+
+### Contact me:
+hemapriyaweb@gmai.com
+linkedin.com/in/hemaps
